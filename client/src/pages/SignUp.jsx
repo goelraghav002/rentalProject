@@ -44,6 +44,13 @@ export default function SignUp() {
       <h1 className='text-3xl text-center font-semibold my-7'>Sign Up</h1>
       <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
         <input
+          type='email'
+          placeholder='email'
+          className='border p-3 rounded-lg'
+          id='email'
+          onChange={handleChange}
+        />
+        <input
           type='text'
           placeholder='username'
           className='border p-3 rounded-lg'
@@ -51,10 +58,24 @@ export default function SignUp() {
           onChange={handleChange}
         />
         <input
-          type='email'
-          placeholder='email'
+          type='text'
+          placeholder='phone'
           className='border p-3 rounded-lg'
-          id='email'
+          id='phone'
+          onChange={handleChange}
+        />
+        <input
+          type='text'
+          placeholder='Occupation (Student/Professional)'
+          className='border p-3 rounded-lg'
+          id='occupation'
+          onChange={handleChange}
+        />
+        <input
+          type='text'
+          placeholder='Work Place (University Name/Company Name)'
+          className='border p-3 rounded-lg'
+          id='workPlace'
           onChange={handleChange}
         />
         <input

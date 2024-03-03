@@ -212,6 +212,30 @@ export default function Profile() {
               onChange={handleChange}
             />
             <input
+              type="text"
+              placeholder="phone"
+              defaultValue={currentUser.phone}
+              id="phone"
+              className="border p-3 rounded-lg"
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              placeholder="Occupation"
+              defaultValue={currentUser.occupation}
+              id="occupation"
+              className="border p-3 rounded-lg"
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              placeholder="Work Place"
+              defaultValue={currentUser.workPlace}
+              id="workPlace"
+              className="border p-3 rounded-lg"
+              onChange={handleChange}
+            />
+            <input
               type="email"
               placeholder="email"
               id="email"
@@ -260,7 +284,7 @@ export default function Profile() {
           <p className="text-green-700 mt-5">
             {updateSuccess ? "User is updated successfully!" : ""}
           </p>
-          <button
+          {/* <button
             onClick={handleShowListings}
             className="text-green-700 w-full"
           >
@@ -308,7 +332,7 @@ export default function Profile() {
                 </div>
               ))}
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </>
