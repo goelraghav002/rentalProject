@@ -139,7 +139,7 @@ export default function Listing() {
             {currentUser && listing.userRef !== currentUser._id && !contact && (
               <button
                 onClick={() => setContact(true)}
-                className=" text-white rounded-lg uppercase hover:opacity-95 p-3"
+                className=" text-white bg-blue-400 rounded-lg uppercase hover:opacity-95 p-3"
               >
                 Contact landlord
               </button>
