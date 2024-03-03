@@ -227,20 +227,19 @@ export default function Profile() {
               className="border p-3 rounded-lg"
             />
             <div className=" flex flex-col items-center">
-            <button
-              disabled={loading}
-              className=" bg-blue-400 text-white rounded-lg p-3 my-1 uppercase hover:opacity-95 disabled:opacity-80 w-[350px] "
-            >
-              {loading ? "Loading..." : "Update"}
-            </button>
-            <Link
-              className="bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacity-95  w-[350px] "
-              to={"/create-listing"}
-            >
-              Create Listing
-            </Link>
+              <button
+                disabled={loading}
+                className=" bg-blue-400 text-white rounded-lg p-3 my-1 uppercase hover:opacity-95 disabled:opacity-80 w-11/12 "
+              >
+                {loading ? "Loading..." : "Update"}
+              </button>
+              <Link
+                className="bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacity-95  w-11/12 "
+                to={"/create-listing"}
+              >
+                Create Listing
+              </Link>
             </div>
-            
           </form>
           <div className="flex justify-between mt-5">
             <span
