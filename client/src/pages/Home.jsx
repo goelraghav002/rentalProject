@@ -87,7 +87,7 @@ export default function Home() {
         <div>
         <form
           onSubmit={handleSubmit}
-          className="bg-slate-100 p-3 w-3/4 rounded-lg flex items-center"
+          className="bg-slate-100 p-3 w-fit rounded-lg flex items-center"
         >
           <input
             type="text"
