@@ -7,3 +7,28 @@ box-shadow:0 0px 6px 0 rgba(0, 0, 0, 0.7);
 .shadow-list:hover{
     box-shadow: rgba(0, 0, 0, 0.5) 0px 3px 10px;
 }
+/* other.css */
+/* other.css */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Ensure the header is on top of other content */
+    background-color: rgba(0, 0, 255, 0.75); /* Initial shade of blue */
+    transition: background-color 0.3s ease; /* Smooth transition on hover */
+  }
+  
+  header:hover {
+    background-color: rgba(168, 168, 208, 0.9); /* Darker shade of blue on hover */
+  }
+  header.bg-opacity-75 {
+    background-color: rgba(255, 255, 255, 0.75); /* Background color with opacity */
+  }
+  
+  
+  .content {
+    padding-top: 80px; /* Adjust the value to match the height of your header */
+    /* This ensures content starts below the header */
+  }
+  

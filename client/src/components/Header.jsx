@@ -4,10 +4,22 @@ import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import house1 from "../assets/house1.svg";
 import "./other.css";
+
 export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const [scrollY, setScrollY] = useState(0);
+
+  const handleScroll = () => {
+    setScrollY(window.scrollY);
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const urlParams = new URLSearchParams(window.location.search);
@@ -23,17 +35,21 @@ export default function Header() {
       setSearchTerm(searchTermFromUrl);
     }
   }, [location.search]);
+
   return (
-    <header className="bg-white shadowcss">
+    <header
+      className={`bg-white shadowcss ${
+        scrollY > 0 ? "bg-opacity-75" : "bg-opacity-100"
+      }`}
+    >
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
         <Link to="/">
           <div className="flex flex-row">
-
-          <img src={house1} className="w-6" ></img>
-          <h1 className="font-bold text-sm sm:text-xl flex flex-wrap">
-            <span className="text-blue-500">rental</span>
-            <span className="text-blue-700">Buddies</span>
-          </h1>
+            <img src={house1} className="w-6" alt="logo" />
+            <h1 className="font-bold text-sm sm:text-xl flex flex-wrap">
+              <span className="text-blue-500">rental</span>
+              <span className="text-blue-700">Buddies</span>
+            </h1>
           </div>
         </Link>
         <form
