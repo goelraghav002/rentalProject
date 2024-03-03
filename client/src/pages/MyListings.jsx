@@ -21,7 +21,6 @@ import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import profilehouse from "../assets/profilehouse.jpg";
 
-
 export default function MyListings() {
   const fileRef = useRef(null);
   const { currentUser, loading, error } = useSelector((state) => state.user);
@@ -68,14 +67,12 @@ export default function MyListings() {
         );
       }
     );
-    };
-    
-    useEffect(() => {
-        handleShowListings();
-    }, [])
+  };
 
+  useEffect(() => {
+    handleShowListings();
+  }, []);
 
-    
   const handleShowListings = async () => {
     try {
       setShowListingsError(false);
@@ -114,7 +111,15 @@ export default function MyListings() {
     <>
       <div className=" flex flex-row">
         <div className="p-3 shadow-lg rounded-lg mx-auto w-[950px] my-[30px]">
-          <h1 className="text-3xl font-semibold text-center ">My Listings</h1>
+          <h1 className="text-5xl font-semibold text-center ">My Listings</h1>
+          <div className="flex justify-center m-6">
+            <Link
+              className="bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacity-95  w-[200px] "
+              to={"/create-listing"}
+            >
+              Create Listing
+            </Link>
+          </div>
 
           {/* <button
             onClick={handleShowListings}
