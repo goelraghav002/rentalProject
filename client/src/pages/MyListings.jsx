@@ -115,7 +115,7 @@ export default function MyListings() {
       <div className=" flex flex-row">
         <div className="p-3 shadow-lg rounded-lg mx-auto w-[950px] my-[30px]">
           <h1 className="text-3xl font-semibold text-center ">My Listings</h1>
-          
+
           {/* <button
             onClick={handleShowListings}
             className="text-green-700 w-full"
@@ -147,15 +147,17 @@ export default function MyListings() {
                     <p>{listing.name}</p>
                   </Link>
 
-                  <div className="flex flex-col item-center">
+                  <div className="flex flex-row item-center">
                     <button
                       onClick={() => handleListingDelete(listing._id)}
-                      className="text-red-700 uppercase"
+                      className="text-white font-bold uppercase bg-red-600 m-3 p-2 rounded-lg"
                     >
                       Delete
                     </button>
                     <Link to={`/update-listing/${listing._id}`}>
-                      <button className="text-green-700 uppercase">Edit</button>
+                      <button className="text-white font-bold uppercase bg-green-700 m-3 p-2 rounded-lg">
+                        Edit
+                      </button>
                     </Link>
                   </div>
                 </div>
