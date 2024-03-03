@@ -164,15 +164,15 @@ export default function Profile() {
   };
   return (
     <>
-      <div className=" flex flex-row">
-        {/* <div className="max-h-full">
+      <div className=" mx-auto justify-center flex flex-row mt-6 rounded-lg shadow-top">
+        <div className="max-h-full">
           <img
             src={profilehouse}
             alt="profilehouse"
-            className=" h-screen object-cover  h-[500px] "
+            className=" w-[300px] h-[600px] object-cover    "
           />
-        </div> */}
-        <div className="p-3 shadow-lg rounded-lg mx-auto w-[450px] my-3px">
+        </div>
+        <div className="p-3 shadow-lg rounded-lg h-[600px] w-[450px] my-3px">
           <h1 className="text-3xl font-semibold text-center ">Profile</h1>
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <input
@@ -226,18 +226,21 @@ export default function Profile() {
               id="password"
               className="border p-3 rounded-lg"
             />
+            <div className=" flex flex-col items-center">
             <button
               disabled={loading}
-              className=" text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80 "
+              className=" bg-blue-400 text-white rounded-lg p-3 my-1 uppercase hover:opacity-95 disabled:opacity-80 w-[350px] "
             >
               {loading ? "Loading..." : "Update"}
             </button>
             <Link
-              className="bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacity-95  max-w-[350px] "
+              className="bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacity-95  w-[350px] "
               to={"/create-listing"}
             >
               Create Listing
             </Link>
+            </div>
+            
           </form>
           <div className="flex justify-between mt-5">
             <span
@@ -270,7 +273,7 @@ export default function Profile() {
 
           {userListings && userListings.length > 0 && (
             <div className="flex flex-col gap-4">
-              <h1 className="text-center mt-7 text-2xl font-semibold">
+              <h1 className="text-center mt-3 text-2xl font-semibold">
                 Your Listings
               </h1>
               {userListings.map((listing) => (
