@@ -24,7 +24,7 @@ export default function Header() {
     }
   }, [location.search]);
   return (
-    <header className="bg-white shadow z-10">
+    <header className="bg-white shadowcss">
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
         <Link to="/">
           <div className="flex flex-row">
