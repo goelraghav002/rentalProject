@@ -1,3 +1,9 @@
-.shadow{
-box-shadow:0 0px 12px 0 rgba(0, 0, 0, 0.8);
+.shadowcss{
+box-shadow:0 0px 6px 0 rgba(0, 0, 0, 0.7);
+}
+.shadow-list{
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 10px;
+}
+.shadow-list:hover{
+    box-shadow: rgba(0, 0, 0, 0.5) 0px 3px 10px;
 }
