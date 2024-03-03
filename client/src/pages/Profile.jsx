@@ -169,10 +169,10 @@ export default function Profile() {
           <img
             src={profilehouse}
             alt="profilehouse"
-            className=" w-[300px] h-[600px] object-cover    "
+            className="my-3 w-[300px] h-[700px] object-cover"
           />
         </div>
-        <div className="p-3 shadow-lg rounded-lg h-[600px] w-[450px] my-3px">
+        <div className="p-3 shadow-lg rounded-lg h-[700px] w-[450px] my-3">
           <h1 className="text-3xl font-semibold text-center ">Profile</h1>
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <input
