@@ -12,6 +12,8 @@ export default function Search() {
     offer: false,
     sort: "created_at",
     order: "desc",
+    minPrice: "",
+    maxPrice: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -27,6 +29,8 @@ export default function Search() {
     const offerFromUrl = urlParams.get("offer");
     const sortFromUrl = urlParams.get("sort");
     const orderFromUrl = urlParams.get("order");
+    const minPriceFromUrl = urlParams.get("minPrice");
+    const maxPriceFromUrl = urlParams.get("maxPrice");
 
     if (
       searchTermFromUrl ||
@@ -35,7 +39,9 @@ export default function Search() {
       furnishedFromUrl ||
       offerFromUrl ||
       sortFromUrl ||
-      orderFromUrl
+      orderFromUrl ||
+      minPriceFromUrl ||
+      maxPriceFromUrl
     ) {
       setSidebardata({
         searchTerm: searchTermFromUrl || "",
@@ -45,6 +51,8 @@ export default function Search() {
         offer: offerFromUrl === "true" ? true : false,
         sort: sortFromUrl || "created_at",
         order: orderFromUrl || "desc",
+        minPrice: minPriceFromUrl || "",
+        maxPrice: maxPriceFromUrl || "",
       });
     }
 
@@ -98,6 +106,14 @@ export default function Search() {
 
       setSidebardata({ ...sidebardata, sort, order });
     }
+
+    if (e.target.id === "minPrice") {
+      setSidebardata({ ...sidebardata, minPrice: e.target.value });
+    }
+
+    if (e.target.id === "maxPrice") {
+      setSidebardata({ ...sidebardata, maxPrice: e.target.value });
+    }
   };
 
   const handleSubmit = (e) => {
@@ -110,6 +126,8 @@ export default function Search() {
     urlParams.set("offer", sidebardata.offer);
     urlParams.set("sort", sidebardata.sort);
     urlParams.set("order", sidebardata.order);
+    urlParams.set("minPrice", sidebardata.minPrice);
+    urlParams.set("maxPrice", sidebardata.maxPrice);
     const searchQuery = urlParams.toString();
     navigate(`/search?${searchQuery}`);
   };
@@ -223,6 +241,32 @@ export default function Search() {
               <option value="createdAt_desc">Latest</option>
               <option value="createdAt_asc">Oldest</option>
             </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="whitespace-nowrap font-semibold">
+              Minimum Price
+            </label>
+            <input
+              type="text"
+              id="minPrice"
+              placeholder="Minimum Price"
+              className="border rounded-lg p-3 w-full"
+              value={sidebardata.minPrice}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="whitespace-nowrap font-semibold">
+              Maximum Price
+            </label>
+            <input
+              type="text"
+              id="maxPrice"
+              placeholder="Maximum Price"
+              className="border rounded-lg p-3 w-full"
+              value={sidebardata.maxPrice}
+              onChange={handleChange}
+            />
           </div>
           <button className=" text-white bg-blue-400 p-3 rounded-lg uppercase hover:opacity-95">
             Search

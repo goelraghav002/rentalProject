@@ -273,7 +273,7 @@ export default function CreateListing() {
                 type="number"
                 id="regularPrice"
                 min="50"
-                max="10000000"
+                max="1000000000000000"
                 required
                 className="p-3 border border-gray-300 rounded-lg"
                 onChange={handleChange}

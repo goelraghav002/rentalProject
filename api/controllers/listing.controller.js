@@ -96,6 +96,10 @@ export const getListings = async (req, res, next) => {
 
     const order = req.query.order || 'desc';
 
+    const minPrice = req.query.minPrice || 0;
+
+    const maxPrice = req.query.maxPrice || 100000000;
+
     const listings = await Listing.find({
       // name: { $regex: searchTerm, $options: 'i' },
       address: { $regex: searchTerm, $options: 'i' },
@@ -105,6 +109,7 @@ export const getListings = async (req, res, next) => {
       type,
     })
       .sort({ [sort]: order })
+      .find({ regularPrice: { $gte: minPrice, $lte: maxPrice } })
       .limit(limit)
       .skip(startIndex);
 
