@@ -25,6 +25,7 @@ export default function CreateListing() {
     regularPrice: 50,
     discountPrice: 0,
     offer: false,
+    isRented: false,
     parking: false,
     furnished: false,
   });
@@ -115,7 +116,12 @@ export default function CreateListing() {
         type: e.target.id,
       });
     }
-
+    if (e.target.id === 'isRented') {
+      setFormData({
+        ...formData,
+        [e.target.id]: e.target.value,
+      });
+    }
     if (
       e.target.id === 'parking' ||
       e.target.id === 'furnished' ||
@@ -331,6 +337,19 @@ export default function CreateListing() {
               The first image will be the cover (max 6)
             </span>
           </p>
+          <div className='flex gap-2'>
+            <span className="text-md"> Status </span>
+            <select
+              name="isRented"
+              id="isRented"
+              value={formData.isRented}
+              onChange={handleChange}
+            >
+              <option value="rented">Rented</option>
+              <option value="available">Available</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
           <div className="flex gap-4">
             <input
               onChange={(e) => setFiles(e.target.files)}

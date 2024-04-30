@@ -109,10 +109,20 @@ export const getListings = async (req, res, next) => {
       type,
     })
       .sort({ [sort]: order })
-      .find({ regularPrice: { $gte: minPrice, $lte: maxPrice } })
+      .find({ discountPrice: { $gte: minPrice, $lte: maxPrice } })
       .limit(limit)
       .skip(startIndex);
 
+    return res.status(200).json(listings);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export const getListingsForRWA = async (req, res, next) => {
+  try {
+    const listings = await Listing.find({ isRented: 'rented' });
     return res.status(200).json(listings);
   } catch (error) {
     next(error);

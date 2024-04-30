@@ -42,6 +42,12 @@ const listingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    isRented: {
+      type: String,
+      required: true,
+      enum: ["rented", "available", "inactive"],
+      default: "available",
+    },
     offer: {
       type: Boolean,
       required: true,
