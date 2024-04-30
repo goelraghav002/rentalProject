@@ -78,6 +78,11 @@ export default function Header() {
               My Listings
             </li>
           </Link>
+          <Link to="/community">
+            <li className="hidden sm:inline text-black hover:underline">
+             Community
+            </li>
+          </Link>
           <Link to="/profile">
             {currentUser ? (
               <img
