@@ -27,7 +27,7 @@ export default function CreateListing() {
     address: "",
     type: "rent",
     bedrooms: 1,
-    newId: Math.floor(Math.random() * 1000000),
+    contractId: Math.floor(Math.random() * 1000000),
     bathrooms: 1,
     regularPrice: 50,
     discountPrice: 0,
@@ -172,7 +172,7 @@ export default function CreateListing() {
       
       const monthlyRent = formData.discountPrice > 0 ? formData.discountPrice : formData.regularPrice;
 
-      const tx = await contractWithSigner.createLease(monthlyRent, formData.increment, formData.newId);
+      const tx = await contractWithSigner.createLease(monthlyRent, formData.increment, formData.contractId);
       setStatus("Transaction sent, waiting for confirmation...");
       await tx.wait();
       setStatus("Transaction confirmed!");
