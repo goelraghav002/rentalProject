@@ -27,11 +27,11 @@ export default function CreateListing() {
     address: "",
     type: "rent",
     bedrooms: 1,
-    id: Math.floor(Math.random() * 1000000),
+    // id: Math.floor(Math.random() * 1000000),
     bathrooms: 1,
     regularPrice: 50,
     discountPrice: 0,
-    increment: 10,
+    // increment: 10,
     offer: false,
     parking: false,
     furnished: false,
@@ -450,22 +450,22 @@ export default function CreateListing() {
           <div>
             Status {status}
           </div>
-          <button
+          {/* <button
             type="button"
             onClick={handleContractSubmit}
-            disabled={loading || uploading}
+            // disabled={loading || uploading}
             className="p-3 bg-blue-400 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
           >
 
             {loading ? "Creating..." : "Create Contract"}
-          </button>
-          {contractOK && <button
+          </button> */}
+          <button
             disabled={loading || uploading}
             className="p-3 bg-blue-400 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
           >
 
             {loading ? "Creating..." : "Create listing"}
-          </button>}
+          </button>
           {error && <p className="text-red-700 text-sm">{error}</p>}
         </div>
       </form>
