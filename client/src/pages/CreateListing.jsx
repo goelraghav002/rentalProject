@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { ethers } from "ethers";
 import {
   getDownloadURL,
   getStorage,
@@ -8,10 +9,16 @@ import {
 import { app } from "../firebase";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { abi, contractAddress } from "../constants";
 
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
+
+  const [accounts, setAccounts] = useState([]);
+  const [status, setStatus] = useState("");
+  const [contractOK, setContractOK] = useState(false);
+  const [provider, setProvider] = useState(null);
   const [files, setFiles] = useState([]);
   const [formData, setFormData] = useState({
     imageUrls: [],
@@ -20,9 +27,11 @@ export default function CreateListing() {
     address: "",
     type: "rent",
     bedrooms: 1,
+    id: Math.floor(Math.random() * 1000000),
     bathrooms: 1,
     regularPrice: 50,
     discountPrice: 0,
+    increment: 10,
     offer: false,
     parking: false,
     furnished: false,
@@ -60,6 +69,34 @@ export default function CreateListing() {
       setUploading(false);
     }
   };
+
+  async function connectToProvider() {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts",
+        });
+        setAccounts(accounts);
+        setProvider(await new ethers.BrowserProvider(window.ethereum));
+        console.log(accounts);
+      } catch (error) {
+        if (error.code === 4001) {
+          console.log("User rejected request");
+        }
+      }
+    } else {
+      console.log(
+        "Ethereum provider not detected. Please install MetaMask or a similar wallet."
+      );
+    }
+  }
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      connectToProvider();
+    }
+  }, []);
+
 
   const storeImage = async (file) => {
     return new Promise((resolve, reject) => {
@@ -124,8 +161,41 @@ export default function CreateListing() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  
+  
+  const create = async () => {
+    const contract = new ethers.Contract(contractAddress, abi, provider); // Instantiate the contract
+    const signer = provider.getSigner(); // Assumes Metamask or similar is injected in the browser
+    const contractWithSigner = contract.connect(await signer);
+    
+    try {
+      
+      const monthlyRent = formData.discountPrice > 0 ? formData.discountPrice : formData.regularPrice;
+
+      const tx = await contractWithSigner.createLease(monthlyRent, formData.increment, formData.id);
+      setStatus("Transaction sent, waiting for confirmation...");
+      await tx.wait();
+      setStatus("Transaction confirmed!");
+      setContractOK(true);
+
+    } catch (err) {
+      console.error(err);
+      setStatus("Error: " + err.message);
+    }
+    // getLease(1);
+  };
+
+  const handleContractSubmit = async (e) => { 
     e.preventDefault();
+
+    create();
+
+  }
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();    
+    
     try {
       if (formData.imageUrls.length < 1)
         return setError("You must upload at least one image");
@@ -287,6 +357,24 @@ export default function CreateListing() {
                 )}
               </div>
             </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                id="increment"
+                min="1"
+                max="50"
+                required
+                className="p-3 border border-gray-300 rounded-lg"
+                onChange={handleChange}
+                value={formData.increment}
+              />
+              <div className="flex flex-col items-center">
+                <p>Increment</p>
+                {formData.type === "rent" && (
+                  <span className="text-xs">(%/year)</span>
+                )}
+              </div>
+            </div>
             {formData.offer && (
               <div className="flex items-center gap-2">
                 <input
@@ -358,12 +446,26 @@ export default function CreateListing() {
                 </button>
               </div>
             ))}
+          
+          <div>
+            Status {status}
+          </div>
           <button
+            type="button"
+            onClick={handleContractSubmit}
             disabled={loading || uploading}
             className="p-3 bg-blue-400 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
           >
-            {loading ? "Creating..." : "Create listing"}
+
+            {loading ? "Creating..." : "Create Contract"}
           </button>
+          {contractOK && <button
+            disabled={loading || uploading}
+            className="p-3 bg-blue-400 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
+          >
+
+            {loading ? "Creating..." : "Create listing"}
+          </button>}
           {error && <p className="text-red-700 text-sm">{error}</p>}
         </div>
       </form>
