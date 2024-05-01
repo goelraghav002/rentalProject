@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import './style.css'; // Import the CSS file
 
-const socket = io('http://localhost:5000'); // Update with your server URL
+const socket = io('http://localhost:3001'); // Update with your server URL
 
 const Community = () => {
     const [username, setUsername] = useState('');
@@ -30,6 +30,7 @@ const Community = () => {
         e.preventDefault();
         if (username.trim() !== '' && room.trim() !== '') {
             socket.emit('joinRoom', { username, room });
+            setMessages([]); // Reset messages when joining a new room
             setShowForm(false);
         } else {
             alert('Please enter a username and select a room');
@@ -45,6 +46,13 @@ const Community = () => {
         }
     };
 
+    // Handle leaving the room
+const handleLeaveRoom = () => {
+    setShowForm(true); // Show the form again
+    window.location.reload(); // Reload the page
+};
+
+    
     return (
         <div className="community-container">
             {showForm ? (
@@ -92,7 +100,7 @@ const Community = () => {
                 <div className="chat-container">
                     <header className="chat-header">
                         <h1><i className="fas fa-smile"></i> ChatCord</h1>
-                        <a href="/" className="btn">Leave Room</a>
+                        <button className="btn" onClick={handleLeaveRoom}>Leave Room</button>
                     </header>
                     <main className="chat-main">
                         <div className="chat-sidebar">
