@@ -8,18 +8,10 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../firebase";
-import {
-  updateUserStart,
-  updateUserSuccess,
-  updateUserFailure,
-  deleteUserFailure,
-  deleteUserStart,
-  deleteUserSuccess,
-  signOutUserStart,
-} from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import profilehouse from "../assets/profilehouse.jpg";
+import RentedTable from "../components/RentedTable";
 
 export default function MyListings() {
   const fileRef = useRef(null);
@@ -138,6 +130,7 @@ export default function MyListings() {
                   key={listing._id}
                   className="border rounded-lg p-3 flex justify-between items-center gap-4"
                 >
+                  {console.log(listing)}
                   <Link to={`/listing/${listing._id}`}>
                     <img
                       src={listing.imageUrls[0]}
@@ -169,8 +162,10 @@ export default function MyListings() {
               ))}
             </div>
           )}
+
         </div>
       </div>
+          <RentedTable />
     </>
   );
 }

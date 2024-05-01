@@ -180,7 +180,7 @@ export default function CreateListing() {
 
     } catch (err) {
       console.error(err);
-      setStatus("Error: " + err.message);
+      setStatus("Error: " + err.reason);
     }
     // getLease(1);
   };

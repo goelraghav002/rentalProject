@@ -167,7 +167,7 @@ export default function CreateListing() {
 
     } catch (err) {
       console.error(err);
-      setStatus("Error: " + err.message);
+      setStatus("Error: " + err.reason);
     }
   };
 
@@ -186,7 +186,7 @@ export default function CreateListing() {
 
     } catch (err) {
       console.error(err);
-      setStatus("Error: " + err.message);
+      setStatus("Error: " + err.reason);
     }
   };
   const setInactiveFunc = async () => {
@@ -204,7 +204,7 @@ export default function CreateListing() {
 
     } catch (err) {
       console.error(err);
-      setStatus("Error: " + err.message);
+      setStatus("Error: " + err.reason);
     }
   };
 
