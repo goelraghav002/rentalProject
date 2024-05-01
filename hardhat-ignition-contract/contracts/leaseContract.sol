@@ -93,7 +93,7 @@ _;  }
     event LeaseTerminated(Tenant tenant,address owner  ,uint256 endDate, uint256 securityDepositReturned);
     event DisputeHandled(Tenant tenant,address owner );
     event Message(string message);
-  
+    
     function getLeaseState()public view returns(StateLeaseContract){
         return leaseState;
     }
