@@ -10,7 +10,7 @@ import http from 'http';
 import { Server as socketio } from 'socket.io';
 import cors from 'cors';
 import { formatMessage } from './utils/messages.js';
-import { userJoin, getCurrentUser, userLeave, getRoomUsers, resetUsers } from './utils/users.js';
+import { userJoin, getCurrentUser, userLeave, getRoomUsers } from './utils/users.js';
 
 dotenv.config();
 
@@ -65,7 +65,6 @@ const io = new socketio(server, {
 io.on('connection', (socket) => {
     console.log('New WS Connection');
 
-    resetUsers();
     socket.on('joinRoom', ({ username, room }) => {
         const user = userJoin(socket.id, username, room);
         socket.join(user.room);
@@ -85,7 +84,9 @@ io.on('connection', (socket) => {
     // Listen for chatMessage
     socket.on('chatMessage', (msg) => {
         const user = getCurrentUser(socket.id);
-        io.to(user.room).emit('message', formatMessage(user.username, msg));
+        if (user) {
+            io.to(user.room).emit('message', formatMessage(user.username, msg));
+        }
     });
 
     // Runs when client disconnects
