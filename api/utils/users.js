@@ -1,4 +1,4 @@
-let users = [];
+const users = [];
 
 // Join user to chat
 export function userJoin(id, username, room) {
@@ -23,9 +23,4 @@ export function userLeave(id) {
 // Get room users
 export function getRoomUsers(room) {
     return users.filter(user => user.room === room);
-}
-
-// Reset users array
-export function resetUsers() {
-    users = [];
 }

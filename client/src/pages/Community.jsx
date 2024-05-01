@@ -48,9 +48,7 @@ const Community = () => {
 
     const handleLeaveRoom = () => {
         setShowForm(true);
-        setUsers([]); // Clear users from the sidebar
-        resetUsers(); // Reset the users array
-        window.location.refresh(); // Reload the page
+        setUsers([]);
     };
     
     return (
