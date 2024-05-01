@@ -5,6 +5,7 @@ import SwiperCore from "swiper";
 import { useSelector } from "react-redux";
 import { Navigation } from "swiper/modules";
 import "swiper/css/bundle";
+import { ethers } from "ethers";
 import {
   FaBath,
   FaBed,
@@ -15,6 +16,7 @@ import {
   FaShare,
 } from "react-icons/fa";
 import Contact from "../components/Contact";
+import { abi, abiLease, contractAddress } from "../constants";
 
 // https://sabe.io/blog/javascript-format-numbers-commas#:~:text=The%20best%20way%20to%20format,format%20the%20number%20with%20commas.
 
@@ -28,6 +30,75 @@ export default function Listing() {
   const params = useParams();
   const { currentUser } = useSelector((state) => state.user);
 
+  /* async function getDetails() {
+    if (provider) {
+      try {
+        const contract = new ethers.Contract(lease, abiLease, provider);
+        const ownerVal = await contract.getOwner();
+        const tenantVal = await contract.getCurrentTenant();
+        setOwner(ownerVal.toString());
+        setTenant(tenantVal.toString());
+        console.log("Owner:", owner);
+        console.log("Tenant:", tenant);
+      } catch (error) {
+        console.error("Error fetching current value:", error);
+      }
+    } else {
+      console.log("Please connect to a wallet to retrieve value.");
+    }
+  }*/
+
+  const getLease = async (leaseId) => {
+    if (provider) {
+      try {
+        const contract = new ethers.Contract(contractAddress, abi, provider);
+        const value = await contract.getVault(leaseId);
+        setLease(value.toString()); // Convert retrieved value to string
+      } catch (error) {
+        console.error("Error fetching current value:", error);
+      }
+    } else {
+      console.log("Please connect to a wallet to retrieve value.");
+    }
+  };
+
+  const rent = async () => {
+    const contract = new ethers.Contract(lease, abiLease, provider); // Instantiate the contract
+    const signer = provider.getSigner(); // Assumes Metamask or similar is injected in the browser
+    const contractWithSigner = contract.connect(await signer);
+
+    try {
+      const tx = await contractWithSigner.rent();
+      setStatus("Transaction sent, waiting for confirmation...");
+      await tx.wait();
+      setStatus("Transaction confirmed!");
+    } catch (err) {
+      console.error(err);
+      setStatus(err.reason);
+    }
+  };
+
+  async function connectToProvider() {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts",
+        });
+
+        setProvider(await new ethers.BrowserProvider(window.ethereum));
+        console.log(accounts);
+      } catch (error) {
+        if (error.code === 4001) {
+          console.log("User rejected request");
+        }
+      }
+    } else {
+      console.log(
+        "Ethereum provider not detected. Please install MetaMask or a similar wallet."
+      );
+    }
+  }
+
   useEffect(() => {
     const fetchListing = async () => {
       try {
@@ -40,6 +111,7 @@ export default function Listing() {
           return;
         }
         setListing(data);
+
         setLoading(false);
         setError(false);
       } catch (error) {
@@ -48,7 +120,21 @@ export default function Listing() {
       }
     };
     fetchListing();
+    if (typeof window !== "undefined") {
+      connectToProvider();
+    }
   }, [params.listingId]);
+
+  const [provider, setProvider] = useState(null);
+  useEffect(() => {
+    if (provider && listing) {
+      getLease(listing.contractId);
+      console.log("Lease:", lease);
+    }
+  }, [provider]);
+
+  const [status, setStatus] = useState("");
+  const [lease, setLease] = useState();
 
   return (
     <main className="bg-slate-300">
@@ -138,12 +224,13 @@ export default function Listing() {
             </ul>
             {currentUser && listing.userRef !== currentUser._id && !contact && (
               <button
-                onClick={() => setContact(true)}
+                onClick={rent}
                 className=" text-white bg-blue-400 rounded-lg uppercase hover:opacity-95 p-3"
               >
-                Contact landlord
+                RENT
               </button>
             )}
+            <p>{status}</p>
             {contact && <Contact listing={listing} />}
           </div>
         </div>
