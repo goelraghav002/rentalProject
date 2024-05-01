@@ -119,7 +119,7 @@ export const abi = [
   ]
 
 export const contractAddress = "0x826A7004BAfeF240E38A258beeFA9AE3FE5C3da5";
-
+export const contractAddressLease = "0x1c3C85Af3dd340aB6732e106845D5AEd70e5012b";
 export const abiLease = [
     {
       "inputs": [],
