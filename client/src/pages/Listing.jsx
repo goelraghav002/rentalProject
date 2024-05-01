@@ -54,6 +54,7 @@ export default function Listing() {
         const contract = new ethers.Contract(contractAddress, abi, provider);
         const value = await contract.getVault(leaseId);
         setLease(value.toString()); // Convert retrieved value to string
+        console.log("Lease:", lease);
       } catch (error) {
         console.error("Error fetching current value:", error);
       }
@@ -68,7 +69,13 @@ export default function Listing() {
     const contractWithSigner = contract.connect(await signer);
 
     try {
-      const tx = await contractWithSigner.rent();
+      let monthlyRent = listing.discountPrice
+        ? listing.discountPrice
+        : listing.regularPrice;
+      monthlyRent *= 3;
+      const tx = await contractWithSigner.rent({
+        value: ethers.parseUnits(monthlyRent.toString(), "wei"),
+      });
       setStatus("Transaction sent, waiting for confirmation...");
       await tx.wait();
       setStatus("Transaction confirmed!");
@@ -129,7 +136,7 @@ export default function Listing() {
   useEffect(() => {
     if (provider && listing) {
       getLease(listing.contractId);
-      console.log("Lease:", lease);
+      console.log("Lease:", lease.toString());
     }
   }, [provider]);
 
