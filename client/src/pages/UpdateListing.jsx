@@ -36,6 +36,7 @@ export default function CreateListing() {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const [contractOK, setContractOK] = useState(false);
   const [accounts, setAccounts] = useState([]);
   const [provider, setProvider] = useState(null);
   const [status, setStatus] = useState("");
@@ -158,9 +159,48 @@ export default function CreateListing() {
 
     try {
       const tx = await contractWithSigner.setRented();
+      setStatus(" ");
       setStatus("Transaction sent, waiting for confirmation...");
       await tx.wait();
       setStatus("Transaction confirmed!");
+      setContractOK(true)
+
+    } catch (err) {
+      console.error(err);
+      setStatus("Error: " + err.message);
+    }
+  };
+
+  const setAvailableFunc = async () => {
+    const contract = new ethers.Contract(lease, abiLease, provider); // Instantiate the contract
+    const signer = provider.getSigner(); // Assumes Metamask or similar is injected in the browser
+    const contractWithSigner = contract.connect(await signer);
+
+    try {
+      const tx = await contractWithSigner.setAvailable();
+      setStatus(" ");
+      setStatus("Transaction sent, waiting for confirmation...");
+      await tx.wait();
+      setStatus("Transaction confirmed!");
+      setContractOK(true);
+
+    } catch (err) {
+      console.error(err);
+      setStatus("Error: " + err.message);
+    }
+  };
+  const setInactiveFunc = async () => {
+    const contract = new ethers.Contract(lease, abiLease, provider); // Instantiate the contract
+    const signer = provider.getSigner(); // Assumes Metamask or similar is injected in the browser
+    const contractWithSigner = contract.connect(await signer);
+
+    try {
+      const tx = await contractWithSigner.setInactive();
+      setStatus(" ");
+      setStatus("Transaction sent, waiting for confirmation...");
+      await tx.wait();
+      setStatus("Transaction confirmed!");
+      setContractOK(true);
 
     } catch (err) {
       console.error(err);
@@ -171,21 +211,11 @@ export default function CreateListing() {
   const handleLeaseAddress = async (e) => {
     e.preventDefault()
 
-    if (formData.isRented === 'rented') {
-      getLease(formData.contractId)
-      if (lease !== undefined) {
-        setGotLease(true)
-        console.log(lease)
-      }
+    getLease(formData.contractId)
+    if (lease !== undefined) {
+      setGotLease(true)
+      console.log(lease)
     }
-
-    // if (formData.isRented === 'available') {
-
-    // }
-
-    // if (formData.isRented === 'inactive') {
-
-    // }
   }
 
   const handleChangeState = async (e) => {
@@ -193,7 +223,14 @@ export default function CreateListing() {
 
     if (formData.isRented === 'rented' && lease !== undefined) {
       setRentedFunc(lease)
-      handleSubmit()
+    }
+
+    if (formData.isRented === 'available' && lease !== undefined) {
+      setAvailableFunc(lease)
+    }
+
+    if (formData.isRented === 'inactive' && lease !== undefined) {
+      setInactiveFunc(lease)
     }
   }
 
@@ -423,7 +460,7 @@ export default function CreateListing() {
               The first image will be the cover (max 6)
             </span>
           </p>
-          <div className='flex gap-2 justify- items-center'>
+          <div className='flex gap-2  items-center'>
             <span className="text-md font-bold"> Status: </span>
             <select
               name="isRented"
@@ -437,14 +474,14 @@ export default function CreateListing() {
               <option value="inactive">Inactive</option>
             </select>
 
-            <button
+            {!gotLease && <button
               type='button'
               onClick={handleLeaseAddress}
               className={`p-2 bg-blue-400 text-sm text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80 ${gotLease && 'cursor-not-allowed'}`}
               disabled={gotLease}
             >
               {gotLease ? "Lease Address Found" : "Get Lease Address"}
-            </button>
+            </button>}
             {
               gotLease &&
               <button
@@ -452,11 +489,12 @@ export default function CreateListing() {
               onClick={handleChangeState}
               className={`p-2 bg-blue-400 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80`}
             >
-              {gotLease && "Set Lease to Rented"}
+              {gotLease && `Set Lease to ${formData.isRented}`}
               </button>
             }
-            Status: {status && status}
           </div>
+            
+          {status && status}
           <div className="flex gap-4">
             <input
               onChange={(e) => setFiles(e.target.files)}
@@ -498,13 +536,13 @@ export default function CreateListing() {
                 </button>
               </div>
             ))}
-          <button
+          {contractOK && <button
             type='submit'
             disabled={loading || uploading}
             className="p-3 bg-blue-400 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
           >
             {loading ? "Updating..." : "Update listing"}
-          </button>
+          </button>}
           {error && <p className="text-red-700 text-sm">{error}</p>}
         </div>
       </form>
