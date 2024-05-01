@@ -29,7 +29,7 @@ export default function CreateListing() {
     bedrooms: 1,
     contractId: Math.floor(Math.random() * 1000000),
     bathrooms: 1,
-    regularPrice: 50,
+    regularPrice: 15000,
     discountPrice: 0,
     increment: 10,
     offer: false,
