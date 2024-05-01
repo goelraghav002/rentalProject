@@ -99,7 +99,7 @@ _;  }
     }
     function setAvailable()public onlyOwner  currentTenantNotExist (){leaseState=StateLeaseContract.available;}
     function setRented()public onlyOwner currentTenantNotExist{leaseState=StateLeaseContract.rented;}
-    function setInactive() public onlyOwner {leaseState= StateLeaseContract.inactive;}
+    function setInactive() public onlyOwner currentTenantNotExist{leaseState= StateLeaseContract.inactive;}
     
     function payRent() public payable onlyCurrentTenant advancePaid noRentDue  {    
         // Add payRent function logic here

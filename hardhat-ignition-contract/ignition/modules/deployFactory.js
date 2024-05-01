@@ -1,7 +1,7 @@
 const { buildModule } = require("@nomicfoundation/hardhat-ignition/modules");
 
 module.exports = buildModule("LeaseFactoryModule", (m) => {
-  const leaseFactoryContract= m.contract("LeaseFactory",["0x1c3C85Af3dd340aB6732e106845D5AEd70e5012b"] );
+  const leaseFactoryContract= m.contract("LeaseFactory",["0xA62e667fFac398E4b838a8B6D774e7773CCA75D0"] );
 
   return { leaseFactoryContract };
 });
