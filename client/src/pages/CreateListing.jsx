@@ -16,9 +16,9 @@ export default function CreateListing() {
   const navigate = useNavigate();
 
   const [accounts, setAccounts] = useState([]);
+  const [provider, setProvider] = useState(null);
   const [status, setStatus] = useState("");
   const [contractOK, setContractOK] = useState(false);
-  const [provider, setProvider] = useState(null);
   const [files, setFiles] = useState([]);
   const [formData, setFormData] = useState({
     imageUrls: [],
@@ -261,16 +261,7 @@ export default function CreateListing() {
             value={formData.address}
           />
           <div className="flex gap-6 flex-wrap">
-            <div className="flex gap-2">
-              <input
-                type="checkbox"
-                id="sale"
-                className="w-5"
-                onChange={handleChange}
-                checked={formData.type === "sale"}
-              />
-              <span>Sell</span>
-            </div>
+            
             <div className="flex gap-2">
               <input
                 type="checkbox"

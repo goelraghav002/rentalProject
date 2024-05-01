@@ -6,8 +6,10 @@ import {
   uploadBytesResumable,
 } from 'firebase/storage';
 import { app } from '../firebase';
+import { ethers } from "ethers";
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
+import { abi, abiLease, contractAddress } from '../constants';
 
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
@@ -33,6 +35,12 @@ export default function CreateListing() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const [accounts, setAccounts] = useState([]);
+  const [provider, setProvider] = useState(null);
+  const [status, setStatus] = useState("");
+  const [lease, setLease] = useState();
+  const [gotLease, setGotLease] = useState(false);
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -101,6 +109,93 @@ export default function CreateListing() {
       );
     });
   };
+
+  async function connectToProvider() {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts",
+        });
+        setAccounts(accounts);
+        setProvider(await new ethers.BrowserProvider(window.ethereum));
+        console.log(accounts);
+      } catch (error) {
+        if (error.code === 4001) {
+          console.log("User rejected request");
+        }
+      }
+    } else {
+      console.log(
+        "Ethereum provider not detected. Please install MetaMask or a similar wallet."
+      );
+    }
+  }
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      connectToProvider();
+    }
+  }, []);
+
+  const getLease = async (leaseId) => {
+    if (provider) {
+      try {
+        const contract = new ethers.Contract(contractAddress, abi, provider);
+        const value = await contract.getVault(leaseId);
+        setLease(value.toString()); // Convert retrieved value to string
+      } catch (error) {
+        console.error("Error fetching current value:", error);
+      }
+    } else {
+      console.log("Please connect to a wallet to retrieve value.");
+    }
+  }
+
+  const setRentedFunc = async () => {
+    const contract = new ethers.Contract(lease, abiLease, provider); // Instantiate the contract
+    const signer = provider.getSigner(); // Assumes Metamask or similar is injected in the browser
+    const contractWithSigner = contract.connect(await signer);
+
+    try {
+      const tx = await contractWithSigner.setRented();
+      setStatus("Transaction sent, waiting for confirmation...");
+      await tx.wait();
+      setStatus("Transaction confirmed!");
+
+    } catch (err) {
+      console.error(err);
+      setStatus("Error: " + err.message);
+    }
+  };
+
+  const handleLeaseAddress = async (e) => {
+    e.preventDefault()
+
+    if (formData.isRented === 'rented') {
+      getLease(formData.contractId)
+      if (lease !== undefined) {
+        setGotLease(true)
+        console.log(lease)
+      }
+    }
+
+    // if (formData.isRented === 'available') {
+
+    // }
+
+    // if (formData.isRented === 'inactive') {
+
+    // }
+  }
+
+  const handleChangeState = async (e) => {
+    e.preventDefault();
+
+    if (formData.isRented === 'rented' && lease !== undefined) {
+      setRentedFunc(lease)
+      handleSubmit()
+    }
+  }
 
   const handleRemoveImage = (index) => {
     setFormData({
@@ -212,16 +307,6 @@ export default function CreateListing() {
             value={formData.address}
           />
           <div className="flex gap-6 flex-wrap">
-            {/* <div className="flex gap-2">
-              <input
-                type="checkbox"
-                id="sale"
-                className="w-5"
-                onChange={handleChange}
-                checked={formData.type === "sale"}
-              />
-              <span>Sell</span>
-            </div> */}
             <div className="flex gap-2">
               <input
                 type="checkbox"
@@ -338,18 +423,39 @@ export default function CreateListing() {
               The first image will be the cover (max 6)
             </span>
           </p>
-          <div className='flex gap-2'>
-            <span className="text-md"> Status </span>
+          <div className='flex gap-2 justify- items-center'>
+            <span className="text-md font-bold"> Status: </span>
             <select
               name="isRented"
               id="isRented"
               value={formData.isRented}
               onChange={handleChange}
+              className='border p-3 rounded-md'
             >
               <option value="rented">Rented</option>
               <option value="available">Available</option>
               <option value="inactive">Inactive</option>
             </select>
+
+            <button
+              type='button'
+              onClick={handleLeaseAddress}
+              className={`p-2 bg-blue-400 text-sm text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80 ${gotLease && 'cursor-not-allowed'}`}
+              disabled={gotLease}
+            >
+              {gotLease ? "Lease Address Found" : "Get Lease Address"}
+            </button>
+            {
+              gotLease &&
+              <button
+              type='button'
+              onClick={handleChangeState}
+              className={`p-2 bg-blue-400 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80`}
+            >
+              {gotLease && "Set Lease to Rented"}
+              </button>
+            }
+            Status: {status && status}
           </div>
           <div className="flex gap-4">
             <input
@@ -393,6 +499,7 @@ export default function CreateListing() {
               </div>
             ))}
           <button
+            type='submit'
             disabled={loading || uploading}
             className="p-3 bg-blue-400 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
           >
