@@ -212,7 +212,7 @@ export default function CreateListing() {
             value={formData.address}
           />
           <div className="flex gap-6 flex-wrap">
-            <div className="flex gap-2">
+            {/* <div className="flex gap-2">
               <input
                 type="checkbox"
                 id="sale"
@@ -221,7 +221,7 @@ export default function CreateListing() {
                 checked={formData.type === "sale"}
               />
               <span>Sell</span>
-            </div>
+            </div> */}
             <div className="flex gap-2">
               <input
                 type="checkbox"
@@ -297,7 +297,8 @@ export default function CreateListing() {
                 min="50"
                 max="1000000000000000"
                 required
-                className="p-3 border border-gray-300 rounded-lg"
+                disabled
+                className="p-3 border border-gray-300 rounded-lg cursor-not-allowed text-gray-400"
                 onChange={handleChange}
                 value={formData.regularPrice}
               />
