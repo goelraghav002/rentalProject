@@ -46,12 +46,12 @@ const Community = () => {
         }
     };
 
-    // Handle leaving the room
-const handleLeaveRoom = () => {
-    setShowForm(true); // Show the form again
-    window.location.reload(); // Reload the page
-};
-
+    const handleLeaveRoom = () => {
+        setShowForm(true);
+        setUsers([]); // Clear users from the sidebar
+        resetUsers(); // Reset the users array
+        window.location.refresh(); // Reload the page
+    };
     
     return (
         <div className="community-container">
