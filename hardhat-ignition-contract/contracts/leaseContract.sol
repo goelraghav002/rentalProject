@@ -18,10 +18,9 @@ contract LeaseContract is Initializable{
         bool renewLeaseOwner;
   
     }
-
     address private owner;
+    address public currentTenantAddress;
 
-    Tenant private currentTenant;
     mapping(address => Tenant) private mapTenant;
     enum StateLeaseContract { available, rented, inactive }
     StateLeaseContract private leaseState;   
@@ -33,62 +32,60 @@ contract LeaseContract is Initializable{
         incrementRate=_incrementRate;
         leaseState=StateLeaseContract.available;
         monthlyRent=_monthlyRent;
-
-        
     }
     
+    modifier currentTenantNotExist(){
+require (currentTenantAddress==address(0),"current tenant does  exist");  
+_;  }
     modifier onlyOwner() {
          require(msg.sender == owner, "Only tenant can pay rent");
         _;}   
     modifier onlyCurrentTenant() {
-        require(msg.sender==currentTenant.id, "Only current tenant can call this function");
+        require(msg.sender==mapTenant[currentTenantAddress].id, "Only current tenant can call this function");
         _;}
     modifier onlyOwnerOrCurrentTenant() {
         // Add owner or current tenant check logic here
-      require(msg.sender == owner || msg.sender == currentTenant.id, "Only owner or current tenant can call this function");
+      require(msg.sender == owner || msg.sender == mapTenant[currentTenantAddress].id, "Only owner or current tenant can call this function");
 
         _;}
  
     modifier advancePaid() {
         // Add advance payment check logic here
-        require(currentTenant.advanceAmountPaid==(2*currentTenant.monthlyRent), "Advance amount not paid");
+        require(mapTenant[currentTenantAddress].advanceAmountPaid==(2*mapTenant[currentTenantAddress].monthlyRent), "Advance amount not paid");
         _; }
     
     modifier noRentDue() {
         // Add no rent due check logic here
-        require(currentTenant.rentDue==0, "Rent is due");
+        require(mapTenant[currentTenantAddress].rentDue==0, "Rent is due");
         _;}
     modifier tenantAgree(){
-            require(currentTenant.renewLease==true);
+            require(mapTenant[currentTenantAddress].renewLease==true);
             _;}
     modifier ownerAgree(){
-            require(currentTenant.renewLeaseOwner==true);
+            require(mapTenant[currentTenantAddress].renewLeaseOwner==true);
             _;}
     modifier isAvailable() {
-    
         // Add lease contract Ava check logic here
         require(leaseState==StateLeaseContract.available, "Lease is not up for rent");
         _;}
     
- 
     modifier isRented(){
         require(leaseState==StateLeaseContract.rented, "Lease is not rented");
         _;}
     modifier isInactive(){
         require(leaseState==StateLeaseContract.inactive, "Lease is not inactive");
         _;}
-
-
-      
-
    modifier checkValue() {
         require(msg.value >=3*monthlyRent, "Not enough money");
         _;
     }
     modifier leaseEnded(){
-        require(currentTenant.endDate<block.timestamp,"lease not ended");
+        require(mapTenant[currentTenantAddress].endDate<block.timestamp,"lease not ended");
         _;
     }
+    modifier notRented(){
+        require(leaseState!=StateLeaseContract.rented,"lease is rented");
+        _;}
     event RentPaid(Tenant tenant , uint256 rent, uint256 lastRentPaidDate);
     event LeaseRenewed(Tenant tenant, uint256 rent, uint256 newLastDate);
     event StatusChanged(StateLeaseContract state);
@@ -96,23 +93,21 @@ contract LeaseContract is Initializable{
     event LeaseTerminated(Tenant tenant,address owner  ,uint256 endDate, uint256 securityDepositReturned);
     event DisputeHandled(Tenant tenant,address owner );
     event Message(string message);
-    
-   
-    
-   
-   // set leasestate
-    function setAvailable() public onlyOwner {leaseState=StateLeaseContract.available;}
-    function setRented() public onlyOwner {leaseState=StateLeaseContract.rented;}
+  
+    function getLeaseState()public view returns(StateLeaseContract){
+        return leaseState;
+    }
+    function setAvailable()public onlyOwner  currentTenantNotExist (){leaseState=StateLeaseContract.available;}
+    function setRented()public onlyOwner currentTenantNotExist{leaseState=StateLeaseContract.rented;}
     function setInactive() public onlyOwner {leaseState= StateLeaseContract.inactive;}
     
     function payRent() public payable onlyCurrentTenant advancePaid noRentDue  {    
         // Add payRent function logic here
         require(msg.value>=monthlyRent,"rent amount not paid");
-     if(msg.value >monthlyRent){
-     uint rval=msg.value-monthlyRent;
-      payable(msg.sender).transfer(rval);
-     
-     }
+        if(msg.value >monthlyRent){
+        uint rval=msg.value-monthlyRent;
+        payable(msg.sender).transfer(rval);
+        } 
      //transfer money to owner
         leaseState=StateLeaseContract.rented;
     }
@@ -135,21 +130,23 @@ if(msg.value>3*monthlyRent){
             renewLease: false,  // Assuming lease renewal is not required for now
             renewLeaseOwner:false
         });
-    currentTenant=mapTenant[msg.sender];
+    currentTenantAddress=msg.sender;
+
+    leaseState=StateLeaseContract.rented;
 
 }
 
 
     function setRenewLeaseTenant(bool _decision) public view onlyCurrentTenant(){
-     currentTenant.renewLease==_decision;
+     mapTenant[currentTenantAddress].renewLease==_decision;
 
      }
    
     function setRenewLeaseOwner(bool _decision) public onlyOwner{
-  currentTenant.renewLeaseOwner=_decision;
+  mapTenant[currentTenantAddress].renewLeaseOwner=_decision;
     }
     function RentRenewLease() public payable onlyCurrentTenant tenantAgree noRentDue ownerAgree leaseEnded(){ 
-        currentTenant.endDate=block.timestamp+365 days;
+        mapTenant[currentTenantAddress].endDate=block.timestamp+365 days;
         monthlyRent=monthlyRent+monthlyRent*incrementRate/100;
         require(msg.value>=3*monthlyRent,"not enough money");
         if(msg.value>3*monthlyRent){
@@ -158,12 +155,9 @@ if(msg.value>3*monthlyRent){
     }
                                                       
     }
-   
-    
-    
-    function terminateLease() public onlyOwnerOrCurrentTenant {
+       function terminateLease() public onlyOwnerOrCurrentTenant {
     bool wrongTermination;
-    if (currentTenant.endDate > block.timestamp) {
+    if (mapTenant[currentTenantAddress].endDate > block.timestamp) {
         wrongTermination = true;
     } else {
         wrongTermination = false;
@@ -172,42 +166,39 @@ if(msg.value>3*monthlyRent){
     if (wrongTermination == true) {
         if (msg.sender == owner) {
             // Transfer security deposit to tenant 
-            payable(currentTenant.id).transfer(currentTenant.securityDepositPaid);
-            currentTenant.rentDue = 0;
-            payable(currentTenant.id).transfer(currentTenant.advanceAmountPaid);
+            payable(mapTenant[currentTenantAddress].id).transfer(mapTenant[currentTenantAddress].securityDepositPaid);
+            mapTenant[currentTenantAddress].rentDue = 0;
+            payable(mapTenant[currentTenantAddress].id).transfer(mapTenant[currentTenantAddress].advanceAmountPaid);
             emit Message("Owner terminated lease");
         } else {    
             // Transfer security deposit to owner 
-            payable(owner).transfer(currentTenant.securityDepositPaid);
+            payable(owner).transfer(mapTenant[currentTenantAddress].securityDepositPaid);
             emit Message("security deposit to owner");
 
             // Transfer advance to owner
-            payable(owner).transfer(currentTenant.advanceAmountPaid);
+            payable(owner).transfer(mapTenant[currentTenantAddress].advanceAmountPaid);
             emit Message("advance to owner");
        emit Message("Tenant terminated lease");
         }
     } else {
         // Calculate fine and deduct from security deposit
         uint256 fine = calculateFine();
-        uint256 amountToReturn = currentTenant.securityDepositPaid - fine;
+        uint256 amountToReturn = mapTenant[currentTenantAddress].securityDepositPaid - fine;
         emit Message("security deposit to tenant");
         // Transfer security deposit - fine - rent due to tenant
-        payable(currentTenant.id).transfer(amountToReturn);
+        payable(mapTenant[currentTenantAddress].id).transfer(amountToReturn);
         emit Message("advance to owner");
-        currentTenant.rentDue = 0;
+        mapTenant[currentTenantAddress].rentDue = 0;
         // Transfer advance to owner
-        payable(owner).transfer(currentTenant.advanceAmountPaid);
+        payable(owner).transfer(mapTenant[currentTenantAddress].advanceAmountPaid);
     }
-    currentTenant.endDate = block.timestamp;
+    mapTenant[currentTenantAddress].endDate = block.timestamp;
 
-    leaseState=StateLeaseContract.inactive;
-}
+    leaseState=StateLeaseContract.available;
+  currentTenantAddress=address(0);}
 
-function calculateFine() private view  returns (uint) {
-    
-    
-    
-uint time = (currentTenant.lastRentPaidDate-block.timestamp);
+function calculateFine() private view  returns (uint) {    
+uint time = (mapTenant[currentTenantAddress].lastRentPaidDate-block.timestamp);
 uint desiredTime =30*24*60*60; 
 if(time>desiredTime){
    
@@ -221,7 +212,7 @@ else{
     function transferOwnership(address newOwner) public onlyOwner {
         owner =newOwner;        }
  function getCurrentTenant() public view returns (Tenant memory) {
-        return currentTenant;
+        return mapTenant[currentTenantAddress];
     }
     
     // Additional function to retrieve the owner
