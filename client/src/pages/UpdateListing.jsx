@@ -189,6 +189,7 @@ export default function CreateListing() {
       setStatus("Error: " + err.reason);
     }
   };
+  
   const setInactiveFunc = async () => {
     const contract = new ethers.Contract(lease, abiLease, provider); // Instantiate the contract
     const signer = provider.getSigner(); // Assumes Metamask or similar is injected in the browser
@@ -307,6 +308,32 @@ export default function CreateListing() {
       setLoading(false);
     }
   };
+
+  const handleTerminateLease = async (e) => {
+    e.preventDefault();
+
+
+    const terminateLease = async () => {
+      const contract = new ethers.Contract(lease, abiLease, provider); // Instantiate the contract
+      const signer = provider.getSigner(); // Assumes Metamask or similar is injected in the browser
+      const contractWithSigner = contract.connect(await signer);
+
+      try {
+        const tx = await contractWithSigner.terminateLease();
+        setStatus(" ");
+        setStatus("Transaction sent, waiting for confirmation...");
+        await tx.wait();
+        setStatus("Transaction confirmed!");
+        setContractOK(true);
+
+      } catch (err) {
+        console.error(err);
+        setStatus("Error: " + err.reason);
+      }
+    };
+      await terminateLease()
+  }
+
   return (
     <main className="p-3 max-w-4xl mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">
@@ -427,7 +454,7 @@ export default function CreateListing() {
               <div className="flex flex-col items-center">
                 <p>Regular price</p>
                 {formData.type === "rent" && (
-                  <span className="text-xs">(Rs/month)</span>
+                  <span className="text-xs">(WEI/month)</span>
                 )}
               </div>
             </div>
@@ -446,7 +473,7 @@ export default function CreateListing() {
                 <div className="flex flex-col items-center">
                   <p>Discounted price</p>
                   {formData.type === "rent" && (
-                    <span className="text-xs">(Rs/month)</span>
+                    <span className="text-xs">(WEI/month)</span>
                   )}
                 </div>
               </div>
@@ -536,6 +563,17 @@ export default function CreateListing() {
                 </button>
               </div>
             ))}
+          {
+            formData.isRented === 'rented' && (
+              <button
+                type='button'
+                className="p-3 bg-blue-400 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
+                onClick={handleTerminateLease}
+              >
+                Terminate Lease
+              </button>
+            )
+          }
           {contractOK && <button
             type='submit'
             disabled={loading || uploading}
