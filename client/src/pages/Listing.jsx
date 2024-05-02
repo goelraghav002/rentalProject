@@ -47,7 +47,26 @@ export default function Listing() {
       console.log("Please connect to a wallet to retrieve value.");
     }
   }*/
-
+  const getCurrentTenant = async (leaseId) => {
+    if (provider) {
+      try {
+        const contract = new ethers.Contract(contractAddress, abi, provider);
+        const currtenant = await contract.getCurrentTenant(leaseId);
+        if (
+          currtenant.toString() === "0x0000000000000000000000000000000000000000"
+        ) {
+          console.log("No tenant found");
+        } else {
+          setCurrentTenant(currtenant.toString());
+          console.log("Current Tenant:", currentTenant.toString());
+        }
+      } catch (error) {
+        console.error("Error fetching current value:", error);
+      }
+    } else {
+      console.log("Please connect to a wallet to retrieve value.");
+    }
+  };
   const getLease = async (leaseId) => {
     if (provider) {
       try {
@@ -55,6 +74,7 @@ export default function Listing() {
         const value = await contract.getVault(leaseId);
         setLease(value.toString()); // Convert retrieved value to string
         console.log("Lease:", lease);
+        getCurrentTenant(value.toString());
       } catch (error) {
         console.error("Error fetching current value:", error);
       }
@@ -84,6 +104,27 @@ export default function Listing() {
       setStatus(err.reason);
     }
   };
+  const payRent = async () => {
+    const contract = new ethers.Contract(lease, abiLease, provider); // Instantiate the contract
+    const signer = provider.getSigner(); // Assumes Metamask or similar is injected in the browser
+    const contractWithSigner = contract.connect(await signer);
+
+    try {
+      let monthlyRent = listing.discountPrice
+        ? listing.discountPrice
+        : listing.regularPrice;
+
+      const tx = await contractWithSigner.payRent({
+        value: ethers.parseUnits(monthlyRent.toString(), "wei"),
+      });
+      setStatus("Transaction sent, waiting for confirmation...");
+      await tx.wait();
+      setStatus("Transaction confirmed!");
+    } catch (err) {
+      console.error(err);
+      setStatus(err.reason);
+    }
+  };
 
   async function connectToProvider() {
     if (window.ethereum) {
@@ -91,9 +132,15 @@ export default function Listing() {
         const accounts = await window.ethereum.request({
           method: "eth_requestAccounts",
         });
-
-        setProvider(await new ethers.BrowserProvider(window.ethereum));
         console.log(accounts);
+        const PROVIDER = await new ethers.providers.Web3Provider(
+          window.ethereum
+        );
+        setProvider(PROVIDER);
+        const signerAccount = PROVIDER.getSigner();
+        signerAccount.getAddress().then((address) => setAccount(address));
+
+        // console.log(accounts);
       } catch (error) {
         if (error.code === 4001) {
           console.log("User rejected request");
@@ -136,12 +183,13 @@ export default function Listing() {
   useEffect(() => {
     if (provider && listing) {
       getLease(listing.contractId);
-      console.log("Lease:", lease.toString());
     }
   }, [provider]);
 
   const [status, setStatus] = useState("");
   const [lease, setLease] = useState();
+  const [account, setAccount] = useState();
+  const [currentTenant, setCurrentTenant] = useState();
 
   return (
     <main className="bg-slate-300">
@@ -237,6 +285,15 @@ export default function Listing() {
                 RENT
               </button>
             )}
+            {currentTenant === account && (
+              <button
+                onClick={payRent}
+                className=" text-white bg-green-400 rounded-lg uppercase hover:opacity-95 p-3"
+              >
+                PAY RENT
+              </button>
+            )}
+
             <p>{status}</p>
             {contact && <Contact listing={listing} />}
           </div>
