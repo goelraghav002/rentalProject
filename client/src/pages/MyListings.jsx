@@ -12,6 +12,7 @@ import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import profilehouse from "../assets/profilehouse.jpg";
 import RentedTable from "../components/RentedTable";
+import { abi, contractAddress } from "../constants";
 
 export default function MyListings() {
   const fileRef = useRef(null);
@@ -64,6 +65,24 @@ export default function MyListings() {
   useEffect(() => {
     handleShowListings();
   }, []);
+
+  const getLease = async (leaseId) => {
+    if (provider) {
+      try {
+        const contract = new ethers.Contract(contractAddress, abi, provider);
+        const value = await contract.getVault(leaseId);
+        setLease(value.toString()); // Convert retrieved value to string
+        console.log("Lease:", lease);
+      } catch (error) {
+        console.error("Error fetching current value:", error);
+      }
+    } else {
+      console.log("Please connect to a wallet to retrieve value.");
+    }
+  };
+
+
+  
 
   const handleShowListings = async () => {
     try {
