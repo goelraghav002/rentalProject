@@ -47,19 +47,14 @@ export default function Listing() {
       console.log("Please connect to a wallet to retrieve value.");
     }
   }*/
-  const getCurrentTenant = async (leaseId) => {
+  const getCurrentTenant = async () => {
     if (provider) {
       try {
-        const contract = new ethers.Contract(contractAddress, abi, provider);
-        const currtenant = await contract.getCurrentTenant(leaseId);
-        if (
-          currtenant.toString() === "0x0000000000000000000000000000000000000000"
-        ) {
-          console.log("No tenant found");
-        } else {
-          setCurrentTenant(currtenant.toString());
-          console.log("Current Tenant:", currentTenant.toString());
-        }
+        const contract = new ethers.Contract(lease, abiLease, provider);
+        const currtenant = await contract.getCurrentTenant();
+
+        setCurrentTenant(currtenant);
+        console.log("Current Tenant:", currentTenant);
       } catch (error) {
         console.error("Error fetching current value:", error);
       }
@@ -74,7 +69,6 @@ export default function Listing() {
         const value = await contract.getVault(leaseId);
         setLease(value.toString()); // Convert retrieved value to string
         console.log("Lease:", lease);
-        getCurrentTenant(value.toString());
       } catch (error) {
         console.error("Error fetching current value:", error);
       }
@@ -132,15 +126,9 @@ export default function Listing() {
         const accounts = await window.ethereum.request({
           method: "eth_requestAccounts",
         });
-        console.log(accounts);
-        const PROVIDER = await new ethers.providers.Web3Provider(
-          window.ethereum
-        );
-        setProvider(PROVIDER);
-        const signerAccount = PROVIDER.getSigner();
-        signerAccount.getAddress().then((address) => setAccount(address));
-
-        // console.log(accounts);
+        setAccount(accounts[0]);
+        setProvider(await new ethers.BrowserProvider(window.ethereum));
+        console.log(accounts[0]);
       } catch (error) {
         if (error.code === 4001) {
           console.log("User rejected request");
@@ -183,13 +171,15 @@ export default function Listing() {
   useEffect(() => {
     if (provider && listing) {
       getLease(listing.contractId);
+    } else {
+      console.log("No provider found");
     }
   }, [provider]);
 
   const [status, setStatus] = useState("");
   const [lease, setLease] = useState();
   const [account, setAccount] = useState();
-  const [currentTenant, setCurrentTenant] = useState();
+  const [currentTenant, setCurrentTenant] = useState([]);
 
   return (
     <main className="bg-slate-300">
@@ -285,15 +275,25 @@ export default function Listing() {
                 RENT
               </button>
             )}
-            {currentTenant === account && (
-              <button
-                onClick={payRent}
-                className=" text-white bg-green-400 rounded-lg uppercase hover:opacity-95 p-3"
-              >
-                PAY RENT
-              </button>
-            )}
+            {/* {currentTenant && account && currentTenant === account && (
+              <div>
+                <button
+                  onClick={payRent}
+                  className=" text-white bg-green-400 rounded-lg uppercase hover:opacity-95 p-3"
+                >
+                  PAY RENT
+                </button>
 
+                <p>current tenant :{currentTenant}</p>
+              </div>
+            )} */}
+            <button
+              className=" text-white bg-green-400 rounded-lg uppercase hover:opacity-95 p-3"
+              onClick={getCurrentTenant}
+            >
+              Get Current Tenant
+            </button>
+            <p>Current Tenant :{currentTenant[0]}</p>
             <p>{status}</p>
             {contact && <Contact listing={listing} />}
           </div>
