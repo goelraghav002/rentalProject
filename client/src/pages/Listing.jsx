@@ -285,16 +285,13 @@ export default function Listing() {
                 RENT
               </button>
             )}
-            {currentTenant && account && currentTenant === account && (
-              <div>
-                <button
-                  onClick={payRent}
-                  className=" text-white bg-green-400 rounded-lg uppercase hover:opacity-95 p-3"
-                >
-                  PAY RENT
-                </button>
-                <p>current tenant :{currentTenant}</p>
-              </div>
+            {currentTenant === account && (
+              <button
+                onClick={payRent}
+                className=" text-white bg-green-400 rounded-lg uppercase hover:opacity-95 p-3"
+              >
+                PAY RENT
+              </button>
             )}
 
             <p>{status}</p>
