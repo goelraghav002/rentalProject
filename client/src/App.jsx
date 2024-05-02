@@ -12,6 +12,7 @@ import UpdateListing from './pages/UpdateListing';
 import Listing from './pages/Listing';
 import Search from './pages/Search';
 import Community from './pages/Community';
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -35,6 +36,7 @@ export default function App() {
             element={<UpdateListing />}
           />
         </Route>
+       
       </Routes>
     </BrowserRouter>
   );
