@@ -16,9 +16,9 @@ module.exports = {
 
   networks: {
     sepolia: {
-      url: "https://eth-sepolia.g.alchemy.com/v2/lu5euUn39oCYOVFL8OCKN1GrRCtl-gwf",
+      url: process.env.SEPOLIA_RPC_URL,
       accounts: [
-        "051e945cb866367e3dfaa8429fc704ec8793e11492c69e543a2800694c441ad7",
+        process.env.PRIVATE_KEY_ACCOUNT,
       ],
       gas: 2100000,
       gasPrice: 8000000000,
@@ -26,6 +26,6 @@ module.exports = {
   },
 
   etherscan: {
-    apiKey: "5EV98J7WEJZF2YJADJ7AQHJ399VYU74YTG",
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
 };
